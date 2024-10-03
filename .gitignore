@@ -34,3 +34,5 @@
 #aoc inputs
 inputs/*.txt
 inputs/*.json
+
+bin/*
