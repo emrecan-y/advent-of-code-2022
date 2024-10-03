@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+#aoc inputs
+inputs/*.txt
+inputs/*.json
