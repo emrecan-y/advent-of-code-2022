@@ -12,9 +12,11 @@ session.cookies.update(cookies)
 
 #get every input using the login information an write them in to textfiles
 for day in range(1,25):
-    url = "https://adventofcode.com/2022/day/"+ str(day) +"/input"
+    day = str(day)
+    url = "https://adventofcode.com/2022/day/" + day + "/input"
     data = session.get(url).text
-    file = open("./inputs/day_"+ str(day) +".txt", 'w')
+    path = "./inputs/day_" + day + ".txt"
+    file = open(path, 'w')
     file.write(data)
     file.close()
 
