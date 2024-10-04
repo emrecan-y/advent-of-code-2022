@@ -36,3 +36,6 @@ inputs/*.txt
 inputs/*.json
 
 bin/*
+
+#vscode
+.vscode
