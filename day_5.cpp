@@ -27,6 +27,11 @@ public:
         }
 
         std::cout << "The top of each stack using CrateMover9000 results to " << print_result(stack_list) << std::endl;
+
+        for (std::list<char> *p : stack_list)
+        {
+            delete p;
+        }
     }
 
     void part_two()
@@ -57,6 +62,11 @@ public:
         }
 
         std::cout << "The top of each stack using CrateMover9001 results to " << print_result(stack_list) << std::endl;
+
+        for (std::list<char> *p : stack_list)
+        {
+            delete p;
+        }
     }
 
     std::tuple<int, int, int> parse_instruction(std::string s)
