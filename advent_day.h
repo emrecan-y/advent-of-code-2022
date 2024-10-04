@@ -7,6 +7,7 @@ class AdventDay
 {
 public:
     AdventDay(int day);
+    virtual ~AdventDay() {};
     virtual void part_one() = 0;
     virtual void part_two() = 0;
     std::vector<std::string> get_input();
