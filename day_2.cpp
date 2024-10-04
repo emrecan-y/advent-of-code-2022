@@ -8,6 +8,8 @@ public:
 
     void part_one()
     {
+        std::vector<std::string> input = this->get_input();
+
         int point_sum = 0;
         for (int i = 0; i < input.size(); i++)
         {
@@ -18,6 +20,8 @@ public:
 
     void part_two()
     {
+        std::vector<std::string> input = this->get_input();
+
         int point_sum = 0;
         for (int i = 0; i < input.size(); i++)
         {
@@ -72,22 +76,22 @@ public:
             switch (opponent)
             {
             case 'A':
-                return base_point += 3;
+                return base_point + 3;
             case 'B':
-                return base_point += 1;
+                return base_point + 1;
             case 'C':
-                return base_point += 2;
+                return base_point + 2;
             }
         case 'Y':
             base_point = 3;
             switch (opponent)
             {
             case 'A':
-                return base_point += 1;
+                return base_point + 1;
             case 'B':
-                return base_point += 2;
+                return base_point + 2;
             case 'C':
-                return base_point += 3;
+                return base_point + 3;
             }
             break;
         case 'Z':
@@ -95,11 +99,11 @@ public:
             switch (opponent)
             {
             case 'A':
-                return base_point += 2;
+                return base_point + 2;
             case 'B':
-                return base_point += 3;
+                return base_point + 3;
             case 'C':
-                return base_point += 1;
+                return base_point + 1;
             }
             break;
         }

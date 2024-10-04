@@ -1,5 +1,5 @@
-#include "advent_day.h"
 #include <map>
+#include "advent_day.h"
 
 class Day_1 : public AdventDay
 {
@@ -8,6 +8,8 @@ public:
 
     void part_one()
     {
+        std::vector<std::string> input = this->get_input();
+
         int current_sum = 0;
         int max_calories = 0;
         int max_elf_index = 0;
@@ -35,6 +37,8 @@ public:
 
     void part_two()
     {
+        std::vector<std::string> input = this->get_input();
+
         std::vector<int> calories;
         int current_sum = 0;
         for (int i = 0; i <= input.size(); i++)
@@ -56,7 +60,7 @@ public:
         {
             current_sum += calories[i];
         }
-        std::cout << "The sum of the calories count from the top thrre elfes is " << current_sum << std::endl;
+        std::cout << "The sum of the calorie count from the top three elfes is " << current_sum << std::endl;
     }
 };
 
