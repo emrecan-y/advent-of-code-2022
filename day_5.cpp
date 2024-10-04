@@ -48,6 +48,7 @@ public:
         {
             int count, from, to;
             std::tie(count, from, to) = parse_instruction(input[i]);
+            // buffer to keep the order
             std::list<char> move_buffer;
             for (int c = 0; c < count; c++)
             {
