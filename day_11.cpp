@@ -6,9 +6,7 @@ class Monkey
 public:
     Monkey() {}
     virtual ~Monkey() {}
-
-    // changed to unsigned long long for part2
-    std::list<long long> items;
+    std::list<int> items;
 
     char operation_type;
     char operation_value;
@@ -30,41 +28,7 @@ public:
         parse_monkeys(monkeys);
         for (int round = 0; round < 20; round++)
         {
-            for (Monkey *m : monkeys)
-            {
-                std::list<long long> items_copy = m->items;
-                for (int item : items_copy)
-                {
-                    m->total_inspection_count++;
-                    int worry_level = item;
-                    if (m->operation_type == '+')
-                    {
-                        worry_level += m->operation_value;
-                    }
-                    else if (m->operation_type == '*')
-                    { // multiply self
-                        if (m->operation_value == -1)
-                        {
-                            worry_level *= worry_level;
-                        }
-                        else
-                        {
-                            worry_level *= m->operation_value;
-                        }
-                    }
-                    worry_level /= 3;
-
-                    if (worry_level % m->divisible_test_val == 0)
-                    {
-                        monkeys[m->divisible_test_true_destination]->items.push_back(worry_level);
-                    }
-                    else
-                    {
-                        monkeys[m->divisible_test_false_destination]->items.push_back(worry_level);
-                    }
-                    m->items.pop_front();
-                }
-            }
+            play_round(monkeys, true, 0);
         }
         std::set<int> inspection_counts;
         for (Monkey *m : monkeys)
@@ -91,51 +55,77 @@ public:
 
         for (int round = 0; round < 10000; round++)
         {
-            for (Monkey *m : monkeys)
-            {
-                std::list<long long> items_copy = m->items;
-                for (long long worry_level : items_copy)
-                {
-                    m->total_inspection_count++;
-                    if (m->operation_type == '+')
-                    {
-                        worry_level += m->operation_value;
-                    }
-                    else if (m->operation_type == '*')
-                    { // multiply self
-                        if (m->operation_value == -1)
-                        {
-                            worry_level *= worry_level;
-                        }
-                        else
-                        {
-                            worry_level *= m->operation_value;
-                        }
-                    }
-                    worry_level %= common_multiple;
-                    if (worry_level % m->divisible_test_val == 0)
-                    {
-                        monkeys[m->divisible_test_true_destination]->items.push_back(worry_level);
-                    }
-                    else
-                    {
-                        monkeys[m->divisible_test_false_destination]->items.push_back(worry_level);
-                    }
-                    m->items.pop_front();
-                }
-            }
+            play_round(monkeys, false, common_multiple);
         }
+
         std::set<int> inspection_counts;
         for (Monkey *m : monkeys)
         {
             inspection_counts.insert(m->total_inspection_count);
             delete m;
         }
+
         int first_max = *--inspection_counts.end();
         int second_max = *-- --inspection_counts.end();
         long result = long(first_max) * long(second_max);
         std::cout
             << "The level of monkey business after 10000 rounds of stuff-slinging simian shenanigans is " << result << std::endl;
+    }
+
+    void play_round(std::vector<Monkey *> &monkeys, bool divide_by_three, int common_multiple)
+    {
+        for (Monkey *m : monkeys)
+        {
+            std::list<int> items_copy = m->items;
+            for (int worry_level : items_copy)
+            {
+                m->total_inspection_count++;
+                make_operation(m, worry_level);
+
+                if (divide_by_three)
+                {
+                    worry_level /= 3;
+                }
+                else
+                {
+                    worry_level %= common_multiple;
+                }
+
+                monkey_throw(monkeys, m, worry_level);
+                m->items.pop_front();
+            }
+        }
+    }
+
+    void monkey_throw(std::vector<Monkey *> &monkeys, Monkey *m, int &worry_level)
+    {
+        if (worry_level % m->divisible_test_val == 0)
+        {
+            monkeys[m->divisible_test_true_destination]->items.push_back(worry_level);
+        }
+        else
+        {
+            monkeys[m->divisible_test_false_destination]->items.push_back(worry_level);
+        }
+    }
+
+    void make_operation(Monkey *m, int &worry_level)
+    {
+        if (m->operation_type == '+')
+        {
+            worry_level += m->operation_value;
+        }
+        else if (m->operation_type == '*')
+        { // multiply self
+            if (m->operation_value == -1)
+            {
+                worry_level *= worry_level;
+            }
+            else
+            {
+                worry_level *= m->operation_value;
+            }
+        }
     }
 
     void parse_monkeys(std::vector<Monkey *> &monkeys)
