@@ -36,6 +36,7 @@ inputs/*.txt
 inputs/*.json
 
 bin/*
+*.dSYM
 
 #vscode
 .vscode
