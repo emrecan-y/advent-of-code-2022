@@ -4,14 +4,13 @@
 class Day_22 : public AdventDay
 {
 public:
-    Day_22() : AdventDay(0) {}
+    Day_22() : AdventDay(22) {}
 
     void part_one()
     {
         std::vector<std::string> input = this->get_input();
         std::vector<std::vector<char>> monkey_map(input.size() - 2);
         std::vector<std::string> path_commands;
-        std::vector<std::pair<char, std::pair<int, int>>> directions = {{'>', {1, 0}}, {'v', {0, 1}}, {'<', {-1, 0}}, {'^', {0, -1}}};
 
         for (int y = 0; y < input.size(); y++)
         {
@@ -52,63 +51,65 @@ public:
             else
             {
                 int move_count = std::stoi(command);
-                auto [diff_x, diff_y] = directions[current_direction].second;
-
-                for (; move_count > 0; move_count--)
-                {
-                    monkey_map[current_y][current_x] = directions[current_direction].first;
-                    int new_x = current_x + diff_x;
-
-                    int new_y = current_y + diff_y;
-                    bool within_bounds_x = new_x >= 0 && new_x < monkey_map[current_y].size();
-                    bool within_bounds_y = new_y >= 0 && new_y < monkey_map.size();
-
-                    if ((current_direction % 2 == 0 && within_bounds_x && monkey_map[current_y][new_x] != ' ') ||
-                        (current_direction % 2 == 1 && within_bounds_y && monkey_map[new_y][current_x] != ' '))
-                    {
-                        if (current_direction % 2 == 0 && monkey_map[current_y][new_x] != '#')
-                        {
-                            current_x = new_x;
-                        }
-                        else if (current_direction % 2 == 1 && monkey_map[new_y][current_x] != '#')
-                        {
-                            current_y = new_y;
-                        }
-                        else
-                        {
-                            move_count = 0;
-                        }
-                    }
-                    else
-                    {
-                        if (current_direction % 2 == 0)
-                        {
-                            new_x = (current_direction == 0) ? find_horizontal_wrap(monkey_map, current_y) : monkey_map[current_y].size() - 1;
-                        }
-                        else
-                        {
-                            new_y = find_vertical_wrap(monkey_map, current_x, current_direction);
-                        }
-                        if (monkey_map[new_y][new_x] == '#')
-                        {
-                            move_count = 0;
-                        }
-                        else
-                        {
-                            current_x = new_x;
-                            current_y = new_y;
-                        }
-                    }
-                    monkey_map[current_y][current_x] = directions[current_direction].first;
-                }
+                make_move(monkey_map, current_x, current_y, move_count, current_direction);
             }
         }
-        print_monkey_map(monkey_map);
-        int out = (current_y + 1) * 1000 + (current_x + 1) * 4 + current_direction;
-        std::cout << out << monkey_map[current_y][current_x] << std::endl;
+        // print_monkey_map(monkey_map);
+        int password = (current_y + 1) * 1000 + (current_x + 1) * 4 + current_direction;
+        std::cout << "The final password is " << password << std::endl;
     }
 
-    int find_vertical_wrap(std::vector<std::vector<char>> monkey_map, int current_x, int current_direction)
+    void make_move(std::vector<std::vector<char>> &monkey_map, int &current_x, int &current_y, int move_count, int &current_direction)
+    {
+        std::vector<std::pair<char, std::pair<int, int>>> directions = {{'>', {1, 0}}, {'v', {0, 1}}, {'<', {-1, 0}}, {'^', {0, -1}}};
+        auto [diff_x, diff_y] = directions[current_direction].second;
+
+        for (; move_count > 0; move_count--)
+        {
+            monkey_map[current_y][current_x] = directions[current_direction].first;
+            int new_x = current_x + diff_x;
+
+            int new_y = current_y + diff_y;
+            bool within_bounds_x = new_x >= 0 && new_x < monkey_map[current_y].size();
+            bool within_bounds_y = new_y >= 0 && new_y < monkey_map.size();
+
+            if ((current_direction % 2 == 0 && within_bounds_x && monkey_map[current_y][new_x] != ' ') ||
+                (current_direction % 2 == 1 && within_bounds_y && current_x < monkey_map[new_y].size() && monkey_map[new_y][current_x] != ' '))
+            {
+                if (current_direction % 2 == 0 && monkey_map[current_y][new_x] != '#' && monkey_map[new_y][current_x] != ' ')
+                {
+                    current_x = new_x;
+                }
+                else if (current_direction % 2 == 1 && monkey_map[new_y][current_x] != '#' && monkey_map[new_y][current_x] != ' ')
+                {
+                    current_y = new_y;
+                }
+            }
+            else
+            {
+                if (current_direction % 2 == 0)
+                {
+                    new_x = (current_direction == 0) ? find_horizontal_wrap(monkey_map, current_y) : monkey_map[current_y].size() - 1;
+                }
+                else
+                {
+                    new_y = find_vertical_wrap(monkey_map, current_x, current_direction);
+                }
+                if (monkey_map[new_y][new_x] == '#')
+                {
+                    move_count = 0;
+                }
+                else
+                {
+                    current_x = new_x;
+                    current_y = new_y;
+                }
+            }
+            monkey_map[current_y][current_x] = directions[current_direction].first;
+        }
+    }
+
+    int find_vertical_wrap(std::vector<std::vector<char>> &monkey_map, int current_x, int current_direction)
     {
         if (current_direction == 1) // down
         {
@@ -133,7 +134,7 @@ public:
         return -1;
     }
 
-    int find_horizontal_wrap(std::vector<std::vector<char>> monkey_map, int current_y)
+    int find_horizontal_wrap(std::vector<std::vector<char>> &monkey_map, int current_y)
     {
         for (int x = 0; x < monkey_map[current_y].size(); x++)
         {
@@ -145,7 +146,7 @@ public:
         return -1;
     }
 
-    void print_monkey_map(std::vector<std::vector<char>> monkey_map)
+    void print_monkey_map(std::vector<std::vector<char>> &monkey_map)
     {
         for (auto v : monkey_map)
         {
@@ -192,25 +193,11 @@ public:
     {
         if (turn_command == 'R')
         {
-            if (current_direction + 1 <= 3)
-            {
-                current_direction++;
-            }
-            else
-            {
-                current_direction = 0;
-            }
+            current_direction = current_direction + 1 <= 3 ? current_direction + 1 : 0;
         }
         else if (turn_command == 'L')
         {
-            if (current_direction - 1 >= 0)
-            {
-                current_direction--;
-            }
-            else
-            {
-                current_direction = 3;
-            }
+            current_direction = current_direction - 1 >= 0 ? current_direction - 1 : 3;
         }
         return current_direction;
     }
