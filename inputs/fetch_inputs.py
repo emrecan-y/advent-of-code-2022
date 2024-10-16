@@ -11,7 +11,7 @@ cookies = cookiejar_from_dict(cookies)
 session.cookies.update(cookies)
 
 #get every input using the login information an write them in to textfiles
-for day in range(1,25):
+for day in range(1,26):
     day = str(day)
     url = "https://adventofcode.com/2022/day/" + day + "/input"
     data = session.get(url).text
