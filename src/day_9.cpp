@@ -4,131 +4,103 @@
 class Day_9 : public AdventDay
 {
 public:
-    Day_9() : AdventDay(0) {}
+    Day_9() : AdventDay(9) {}
     void part_one()
     {
-        std::vector<std::string> input = this->get_input();
-        std::set<std::tuple<int, int>> tail_visited_coordinates;
-        int head_y, head_x, tail_y, tail_x;
-        head_y = head_x = tail_y = tail_x = 0;
-        tail_visited_coordinates.insert({tail_y, tail_x});
+        int rope_length = 2;
+        int distinct_rope_visits = simulate_rope_and_count_tail(rope_length);
+        std::cout << "The tail of a rope with length " << rope_length << " has visited " << distinct_rope_visits << " distinct places" << std::endl;
+    }
 
+    void part_two()
+    {
+        int rope_length = 10;
+        int distinct_rope_visits = simulate_rope_and_count_tail(rope_length);
+        std::cout << "The tail of a rope with length " << rope_length << " has visited " << distinct_rope_visits << " distinct places" << std::endl;
+    }
+
+    int simulate_rope_and_count_tail(int rope_length)
+    {
+        std::vector<std::string> input = this->get_input();
+        std::set<std::pair<int, int>> tail_visited_coordinates;
+        std::vector<std::pair<int, int>> rope(rope_length, std::pair<int, int>(0, 0));
+        tail_visited_coordinates.insert(rope.back());
         for (int i = 0; i < input.size(); i++)
         {
             char direction = input[i][0];
             int move_count = std::stoi(input[i].substr(2));
             for (int i = 0; i < move_count; i++)
             {
-                int old_head_y = head_y;
-                int old_head_x = head_x;
-                switch (direction)
-                {
-                case 'D':
-                    head_y--;
-                    break;
-                case 'U':
-                    head_y++;
-                    break;
-                case 'L':
-                    head_x--;
-                    break;
-                case 'R':
-                    head_x++;
-                    break;
-                }
-                if (abs(head_x - tail_x) > 1 || abs(head_y - tail_y) > 1)
-                {
-                    tail_x = old_head_x;
-                    tail_y = old_head_y;
-                }
-                tail_visited_coordinates.insert({tail_y, tail_x});
+                move_head(direction, rope.front());
+                move_rope(rope);
+                tail_visited_coordinates.insert(rope.back());
             }
         }
-        std::cout << "The distinct count of the places the tail has visited is " << tail_visited_coordinates.size() << std::endl;
+        // print_debug(tail_visited_coordinates);
+        return tail_visited_coordinates.size();
+    }
 
-        std::vector<std::vector<bool>> print(5, std::vector<bool>(6));
-        for (auto e : tail_visited_coordinates)
+    void move_rope(std::vector<std::pair<int, int>> &rope)
+    {
+        for (int r = 1; r < rope.size(); r++)
         {
-            print[std::get<0>(e)][std::get<1>(e)] = true;
-        }
-
-        for (auto e : print)
-        {
-            for (auto a : e)
+            int abs_diff_x = abs(rope[r].first - rope[r - 1].first);
+            int abs_diff_y = abs(rope[r].second - rope[r - 1].second);
+            if (abs_diff_x == 2 && abs_diff_y == 0)
             {
-                if (a)
+                rope[r].first = rope[r].first > rope[r - 1].first ? rope[r].first - 1 : rope[r].first + 1;
+            }
+            else if (abs_diff_y == 2 && abs_diff_x == 0)
+            {
+                rope[r].second = rope[r].second > rope[r - 1].second ? rope[r].second - 1 : rope[r].second + 1;
+            }
+            else if (abs_diff_x > 1 || abs_diff_y > 1)
+            {
+                std::pair<int, int> diagonals[] = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+                for (auto diag : diagonals)
                 {
-                    std::cout << "#";
-                }
-                else
-                {
-                    std::cout << ".";
+                    if (abs(rope[r].first + diag.first - rope[r - 1].first) < 2 && abs(rope[r].second + diag.second - rope[r - 1].second) < 2)
+                    {
+                        rope[r].first += diag.first;
+                        rope[r].second += diag.second;
+                        break;
+                    }
                 }
             }
-            std::cout << std ::endl;
         }
     }
 
-    void part_two()
+    void move_head(char direction, std::pair<int, int> &head)
     {
-        std::vector<std::string> input = this->get_input();
-        std::set<std::tuple<int, int>> tail_visited_coordinates;
-        std::vector<std::tuple<int, int>> rope(10, std::tuple<int, int>(0, 0));
-
-        tail_visited_coordinates.insert(rope.front());
-
-        for (int i = 0; i < input.size(); i++)
+        switch (direction)
         {
-            char direction = input[i][0];
-            int move_count = std::stoi(input[i].substr(2));
-            for (int i = 0; i < move_count - 1; i++)
-            {
-                int old_head_y = std::get<0>(rope.front());
-                int old_head_x = std::get<1>(rope.front());
-                switch (direction)
-                {
-                case 'D':
-                    std::get<0>(rope.front())--;
-                    break;
-                case 'U':
-                    std::get<0>(rope.front())++;
-                    break;
-                case 'L':
-                    std::get<1>(rope.front())--;
-                    break;
-                case 'R':
-                    std::get<1>(rope.front())++;
-                    break;
-                }
-                for (int r = 0; r < rope.size(); r++)
-                {
-                    if (r == 0 && (abs(std::get<0>(rope[r]) - std::get<0>(rope[r + 1])) > 1 || abs(std::get<1>(rope[r]) - std::get<1>(rope[r + 1])) > 1))
-                    {
-                        std::get<0>(rope[r]) = old_head_y;
-                        std::get<1>(rope[r]) = old_head_x;
-                    }
-                    if (abs(std::get<0>(rope[r]) - std::get<0>(rope[r + 1])) > 1 || abs(std::get<1>(rope[r]) - std::get<1>(rope[r + 1])) > 1)
-                    {
-                        std::get<0>(rope[r + 1]) = std::get<0>(rope[r]);
-                        std::get<1>(rope[r + 1]) = std::get<0>(rope[r]);
-                    }
-                }
-                tail_visited_coordinates.insert(rope.front());
-            }
+        case 'D':
+            head.second--;
+            break;
+        case 'U':
+            head.second++;
+            break;
+        case 'L':
+            head.first--;
+            break;
+        case 'R':
+            head.first++;
+            break;
         }
-        std::cout << "The distinct count of the places the tail has visited is " << tail_visited_coordinates.size() << std::endl;
+    }
 
+    void print_debug(std::set<std::pair<int, int>> tail_visited_coordinates)
+    {
         std::vector<std::vector<bool>> print(5, std::vector<bool>(6));
         for (auto e : tail_visited_coordinates)
         {
-            print[std::get<0>(e)][std::get<1>(e)] = true;
+            print[e.second][e.first] = true;
         }
-
-        for (auto e : print)
+        for (int y = print.size() - 1; y >= 0; y--)
         {
-            for (auto a : e)
+            for (int x = 0; x < print[y].size(); x++)
             {
-                if (a)
+                if (print[y][x])
                 {
                     std::cout << "#";
                 }
